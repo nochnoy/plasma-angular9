@@ -1,10 +1,15 @@
 import { Component } from '@angular/core';
+import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+    selector: 'app-root',
+    template: `
+        <div class="main">
+            <main-menu></main-menu>
+            <router-outlet></router-outlet>
+        </div>
+    `
 })
 export class AppComponent {
-  title = 'plasmax';
+    constructor() { }
 }
