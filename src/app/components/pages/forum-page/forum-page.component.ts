@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'forum-page',
@@ -7,9 +10,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ForumPageComponent implements OnInit {
 
-  constructor() { }
+  public forumId: number;
+
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit() {
+    this.route.params.pipe(map(p => p.id))
+      .subscribe((id:any) => {
+        this.forumId = parseInt(id) || 0;
+      });
+
   }
 
 }

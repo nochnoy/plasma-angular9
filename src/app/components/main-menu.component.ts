@@ -29,12 +29,33 @@ export class MainMenuComponent {
     ) {}
 
     ngOnInit() {
-        for (let i = 0; i < 20; i++) {
-            let page = new Page();
-            page.id = i;
-            page.name = 'Страница ' + i;
-            this.pages.push(page);
-        }
+
+        let page: Page;
+        
+        page = new Page();
+        page.id = 1;
+        page.name = 'Главный';
+        this.pages.push(page);
+
+        page = new Page();
+        page.id = 12;
+        page.name = 'Тестовый';
+        this.pages.push(page);
+        
+        page = new Page();
+        page.id = 2;
+        page.name = 'Кухня';
+        this.pages.push(page);
+
+        page = new Page();
+        page.id = 4;
+        page.name = 'Техпомощь';
+        this.pages.push(page);
+
+        page = new Page();
+        page.id = 15;
+        page.name = 'Кабина министров';
+        this.pages.push(page);
     }
 
     

@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Component, OnInit, Input } from '@angular/core';
 
 import { MessageService } from "@app/services/message.service";
 
@@ -14,18 +13,43 @@ import { Channel } from '@model/channel.model';
 export class ForumComponent implements OnInit {
 
 constructor(
-  private http: HttpClient,
   public messagesService: MessageService,
 ) { }
 
-
 public channel: Channel = null;
 
+/** isReady */
+public get isReady():boolean {
+    return this._isReady;
+}
+public set isReady(value:boolean) {
+    this._isReady = value;
+    this.tryLoad();
+}
+private _isReady: boolean = false;
+
+/** id */
+@Input()
+public set id(value:number) {
+    this._id = value;
+    this.tryLoad();
+}
+public get id():number {
+    return this._id;
+}
+private _id:number;
+
 ngOnInit() {
-    this.messagesService.getChannel(25, "2019-09-22 22:21:06", (input) => {
-        this.channel = new Channel();
-        this.channel.deserialize(input);
-    });
+    this.isReady = true;
+}
+
+private tryLoad() {
+    if (this._id && this._isReady) {
+        this.messagesService.getChannel(this.id, "2019-09-22 22:21:06", (input) => {
+            this.channel = new Channel();
+            this.channel.deserialize(input);
+        });
+    }
 }
 
 onExpandClick(event, thread:Thread) {
