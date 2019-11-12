@@ -17,9 +17,9 @@ export class Thread {
     public starredMaxId = 0;
     public isDigest = false;
     public isExpanded = false;
-    public commentsCount: number = 0;
+    public commentsCount = 0;
     public commentsCountText = '';
-    
+
     // Хеш сообщений дерева
     // Помни, что при  схлопах сообщения исчезают из иерархии, но остаются в этом хеше
     private map = new Map<number, Message>();
@@ -28,8 +28,8 @@ export class Thread {
 
     // Methods ----------------------------------------------------------------
 
-    public get isLoaded():boolean {
-        //TODO: сомнительный способ, багоопасный. Но пока пусть будет так.
+    public get isLoaded(): boolean {
+        // TODO: сомнительный способ, багоопасный. Но пока пусть будет так.
         return this.map.values.length == this.commentsCount;
     }
 
@@ -40,11 +40,11 @@ export class Thread {
     }
 
     public addMessage(rawMessage: any): Message {
-        let m = this.getOrCreateMessage(rawMessage.id);
+        const m = this.getOrCreateMessage(rawMessage.id);
         m.deserialize(rawMessage, this.rootId);
 
         if (m.parentId) {
-            let parent = this.getOrCreateMessage(m.parentId);
+            const parent = this.getOrCreateMessage(m.parentId);
             parent.addChild(m);
             if (m.isStarred) {
                 m.important = true;
@@ -74,12 +74,12 @@ export class Thread {
         }
 
         if (c.parentId) {
-            let parent = this.getOrCreateMessage(c.parentId);
+            const parent = this.getOrCreateMessage(c.parentId);
             parent.addChild(c);
         } else {
             this.root = c;
         }
-        
+
         c.thread = this; // А то всякие мерджи давали ему ссылку на оригинальное дерево
 
         // Серыми становятся все сообщения в дайджесте кроме звезданутых
@@ -91,7 +91,7 @@ export class Thread {
     }
 
     private getMessage(id: number): Message {
-        let m = this.map.get(id);
+        const m = this.map.get(id);
         return m || null;
     }
 
@@ -110,14 +110,17 @@ export class Thread {
         this.map.forEach((message) => {
             if (message.children) {
                 message.children.sort((a: Message, b: Message): number => {
-                    let aid = a.id;
-                    let bid = b.id;
-                    if (aid < bid)
+                    const aid = a.id;
+                    const bid = b.id;
+                    if (aid < bid) {
                         return -1;
-                    else if (aid > bid)
+                    }
+                    else if (aid > bid) {
                         return 1;
-                    else
+ }
+                    else {
                         return 0;
+ }
                 });
             }
         });
@@ -138,7 +141,7 @@ export class Thread {
                     // Если мы были в процессе набора схлопа - закрываем его
                     if (shlop) {
                         if (shlop.length > 2) {
-                            this.shlops.push(shlop);                       
+                            this.shlops.push(shlop);
                         }
                         shlop = null; // Этот схлоп закончился. Ищем следующий.
                     }
@@ -182,7 +185,7 @@ export class Thread {
         let starredMessage: Message;
         let dm: Message;
         let m: Message;
-        let dt = new Thread(this.rootId);
+        const dt = new Thread(this.rootId);
         dt.isDigest = true;
         dt.starredMaxId = this.starredMaxId;
 
@@ -202,18 +205,18 @@ export class Thread {
         this.shlops.length = 0;
         this.findShlops(dt.root);
 
-        let shlop:Shlop;
+        let shlop: Shlop;
         for (let i = 0; i < this.shlops.length; i++) {
             shlop = this.shlops[i];
 
             // Схлопнем
-            let s = new ShlopMessage();
+            const s = new ShlopMessage();
             s.id = shlop.start.id;
             s.display = MessageDisplayType.SHLOP;
             s.shlop = shlop;
             s.thread = dt;
-            
-            let startParent = shlop.start.parent;
+
+            const startParent = shlop.start.parent;
             startParent.removeChild(shlop.start); // ВНИМАНИЕ! Мы удаляем детей сообщения, но они всё ещё фигурируют в хеше дерева (map)
             startParent.addChild(s);
             shlop.finish.transferChildrenTo(s);
@@ -226,7 +229,7 @@ export class Thread {
         return dt;
     }
 
-    public unshlop(m:ShlopMessage) {
+    public unshlop(m: ShlopMessage) {
         // Все сообщения в схлопе сделаем не серыми
         let m1 = m.shlop.finish;
         while (m1) {
@@ -234,7 +237,7 @@ export class Thread {
             m1 = m1.parent;
         }
 
-        let parent = m.parent;
+        const parent = m.parent;
         m.transferChildrenTo(m.shlop.finish); // Дети, которые крепились к схлоп-сообщению, вешаются в конец схлопнутой последовательности
         parent.removeChild(m);
         parent.addChild(m.shlop.start);

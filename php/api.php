@@ -26,7 +26,13 @@ switch(@$_REQUEST['cmd']) {
 		$lastVieved = $_REQUEST['lv'];
 		//TODO: Проверка на доступ
 		echo ('{"messages":' . getThreadJson($threadId, $lastVieved) . '}');
-		break;		
+        break;
+        
+    case 'get_channels':
+        $lastVieved = $_REQUEST['lv'];
+        //TODO: Проверка на доступ
+        echo ('{"channels":' . getChannelsJson() . '}');
+        break;
 
 	default:
 		echo('{"error":"Unknown command"}');

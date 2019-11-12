@@ -5,7 +5,9 @@ function sqlerr(){
 	if (strlen($s) > 0) echo($s);
 }
 
+// Подготавливаем текст из бд для всовывания в json
 function jsonifyMessageText($s) {
+
 	// Сообщения в БД хранятся в специфичеки плазма-эскейпнутом виде. Раскукоживаем.
 	$s = htmlspecialchars_decode($s);
 	$s = html_entity_decode($s, ENT_QUOTES);
@@ -137,6 +139,42 @@ function buildMessagesJson($a, $lastViewed) {
 		$s .= '}';
 	}
 	return $s;
+}
+
+// Возвращает json со списком каналов, доступных юзеру
+function getChannelsJson() {
+    $s = '';
+    
+    //$userId = 3749; // Radikha Yoga
+    $userId = 2; // Marat
+
+	$sql  = 'SELECT';
+	$sql .= ' p.id_place, p.parent, p.name, p.description, p.time_changed, p.typ';
+    $sql .= ' FROM tbl_places p';
+    $sql .= ' LEFT JOIN tbl_access a ON a.id_place=p.id_place AND a.id_user='.$userId;
+    $sql .= ' LEFT JOIN lnk_user_place l ON l.id_place=a.id_place AND l.id_user='.$userId;
+	$sql .= ' ORDER BY id_place DESC';
+	$result = mysql_query($sql);
+	sqlerr();
+
+	while ($row = mysql_fetch_array($result)) {
+
+        if (!empty($s)) {
+			$s .= ',';
+        }
+        
+        $s .= '{';
+        $s .= '"id":'				. $row[0];								// id 
+        $s .= ',"pid":'				. $row[1];								// parent id
+        $s .= ',"name":"'		    . jsonifyMessageText($row[2]) . '"';	// name
+        $s .= ',"desc":"'			. jsonifyMessageText($row[3]) . '"';	// description
+        $s .= ',"d":"'				. $row[4] . '"';						// time_created
+        $s .= ',"type":"'			. $row[5] . '"';						// type
+        $s .= '}';
+
+	}
+
+	return '[' . $s . ']';
 }
 
 ?>

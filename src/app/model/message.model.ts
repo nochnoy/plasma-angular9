@@ -1,4 +1,4 @@
-import { Thread } from "./thread.model";
+import { Thread } from './thread.model';
 
 export class Message {
     id: number;
@@ -22,7 +22,7 @@ export class Message {
     parent: Message;
     children: Array<Message>;
 
-    public addChild(child:Message) {
+    public addChild(child: Message) {
         if (!this.children) {
             this.children = new Array<Message>();
         }
@@ -32,9 +32,9 @@ export class Message {
         }
     }
 
-    public removeChild(child:Message) {
+    public removeChild(child: Message) {
         if (this.children) {
-            let ix = this.children.indexOf(child);
+            const ix = this.children.indexOf(child);
             if (ix > -1) {
                 this.children.splice(ix, 1);
                 child.setParent(null);
@@ -42,7 +42,7 @@ export class Message {
         }
     }
 
-    public transferChildrenTo(newParent:Message) {
+    public transferChildrenTo(newParent: Message) {
         if (this.children) {
             let child: Message;
             for (let i = 0; i < this.children.length; i++) {
@@ -53,12 +53,12 @@ export class Message {
         }
     }
 
-    public setParent(parent:Message) {
+    public setParent(parent: Message) {
         this.parent = parent;
     }
 
-    public clone():Message {
-        let c = new Message();
+    public clone(): Message {
+        const c = new Message();
 
         c.id = this.id;
         c.parentId = this.parentId;
@@ -73,7 +73,7 @@ export class Message {
         return c;
     }
 
-    public merge(m:Message) {
+    public merge(m: Message) {
         this.parentId = m.parentId;
         this.rootId = m.rootId;
         this.thread = m.thread;
@@ -84,7 +84,7 @@ export class Message {
         this.important = m.important;
     }
 
-    public deserialize(raw:any, rootId:number) {
+    public deserialize(raw: any, rootId: number) {
         this.id             = raw.id;
         this.parentId       = raw.pid;
         this.rootId         = rootId;
@@ -100,7 +100,7 @@ export class Message {
         if (!(this.id > 0)) {
             // id сообщений должны быть только числовыми и увеличиваться вверх!
             // на это опирается сортировка и подсветка новых сообщений!
-            throw 'Karamba!';
+            throw new Error('Karamba!');
         }
     }
 }

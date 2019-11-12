@@ -1,9 +1,9 @@
-import { Message } from "./message.model";
-import { Shlop } from "./shlop.model";
+import { Message } from './message.model';
+import { Shlop } from './shlop.model';
 
 export class ShlopMessage extends Message {
 
-    constructor () {
+    constructor() {
         super();
     }
 

@@ -13,7 +13,7 @@ import { Page } from '../model/page.model';
         :host {
             min-width: 200px;
             min-height: 200px;
-            
+
         }
         a:active {
             color: red;
@@ -30,8 +30,20 @@ export class MainMenuComponent {
 
     ngOnInit() {
 
-        let page: Page;
-        
+        this.pages.length = 0;
+        this.messagesService.getChannels('', (input) => {
+            var a = input['channels'] as Array<any>;
+            let page: Page;
+            for (const item of a) {
+                page = new Page();
+                page.id = parseInt(item['id']);
+                page.name = item['name'];
+                this.pages.push(page);
+            }
+        });
+
+        /*let page: Page;
+
         page = new Page();
         page.id = 1;
         page.name = 'Главный';
@@ -41,7 +53,7 @@ export class MainMenuComponent {
         page.id = 12;
         page.name = 'Тестовый';
         this.pages.push(page);
-        
+
         page = new Page();
         page.id = 2;
         page.name = 'Кухня';
@@ -55,8 +67,8 @@ export class MainMenuComponent {
         page = new Page();
         page.id = 15;
         page.name = 'Кабина министров';
-        this.pages.push(page);
+        this.pages.push(page);*/
     }
 
-    
+
 }

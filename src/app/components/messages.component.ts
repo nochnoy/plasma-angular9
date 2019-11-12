@@ -10,8 +10,8 @@ import { MessageService } from '../services/message.service';
     selector: 'messages',
     template: `
         <ng-container *ngFor="let message of messages">
-            <div class="msg" 
-                [class.msg-root]="!message.parent" 
+            <div class="msg"
+                [class.msg-root]="!message.parent"
                 [class.msg-starred]="message.isStarred"
                 *ngIf="message != null"
                 >
@@ -43,7 +43,7 @@ import { MessageService } from '../services/message.service';
                             {{message.shlop.lengthText}}
                         </div>
                     </ng-container>
-                    
+
                 </ng-container>
 
                 <messages *ngIf="showChildren && message.children && message.children.length > 0" [messages]="message.children"></messages>
@@ -62,35 +62,37 @@ export class MessagesComponent {
         public messagesService: MessageService,
     ) {}
 
+    @Input('messages')
+    public messages: Array<Message>;
+
+    @Input('showChildren')
+    public showChildren = true;
+
     ngOnInit() {
 
     }
 
-    @Input('messages')
-    public messages:Array<Message>;
-
-    @Input('showChildren')
-    public showChildren: boolean = true;
-
-    public unshlop(event, shlopMessage:ShlopMessage) {
+    public unshlop(event, shlopMessage: ShlopMessage) {
         event.preventDefault();
         shlopMessage.thread.unshlop(shlopMessage);
     }
 
-    getTextColor(message: Message):string {
-        if (message.thread.isDigest)
+    getTextColor(message: Message): string {
+        if (message.thread.isDigest) {
             return this.messagesService.colorDigest;
-        else
+        }
+        else {
             return this.messagesService.colorText;
+        }
     }
 
-    unfoldGray(event, message:Message) {
+    unfoldGray(event, message: Message) {
         event.preventDefault();
         message.display = MessageDisplayType.NORMAL;
     }
 
     chisl(number, titles) {
-        let cases = [2, 0, 1, 1, 1, 2];  
-        return titles[ (number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5] ];  
+        const cases = [2, 0, 1, 1, 1, 2];
+        return titles[ (number % 100 > 4 && number % 100 < 20) ? 2 : cases[(number % 10 < 5) ? number % 10 : 5] ];
     }
 }

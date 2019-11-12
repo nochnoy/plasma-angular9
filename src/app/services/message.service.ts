@@ -11,7 +11,7 @@ export class MessageService {
     public colorDigest = '#ADA99A';
 
     private headers: HttpHeaders;
-    
+
     constructor(
         private http: HttpClient
     ) {
@@ -22,48 +22,69 @@ export class MessageService {
     /**
      * Запрашивает с сервера сообщения канала
      */
-    public getChannel(channelId:number, lastVieved:string, callback:Function) 
-    {
+    public getChannel(channelId: number, lastVieved: string, callback: Function) {
         const params = (new HttpParams())
-            .append("cmd",  "get_channel")
-            .append("cid",  channelId.toString())
-            .append("lv",   lastVieved);
+            .append('cmd',  'get_channel')
+            .append('cid',  channelId.toString())
+            .append('lv',   lastVieved);
 
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params:params}).subscribe(            
+        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
             input => {
                 this.logInput(input);
-                if (callback)
+                if (callback) {
                     callback(input);
+                }
             },
             (err: HttpErrorResponse) => {
                 console.error(err.error);
             }
-        )
+        );
     }
 
     /**
      * Запрашивает с сервера сообщения одного треда
      */
-    public getThread(threadId:number, lastVieved:string, callback:Function) 
-    {
+    public getThread(threadId: number, lastVieved: string, callback: Function) {
         const params = (new HttpParams())
-            .append("cmd",  "get_thread")
-            .append("tid",  threadId.toString())
-            .append("lv",   lastVieved);
+            .append('cmd',  'get_thread')
+            .append('tid',  threadId.toString())
+            .append('lv',   lastVieved);
 
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params:params}).subscribe(            
+        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
             input => {
                 this.logInput(input);
-                if (callback)
+                if (callback) {
                     callback(input);
+                }
             },
             (err: HttpErrorResponse) => {
                 console.error(err.error);
             }
-        )
+        );
     }
 
-    private logInput(input:object) {
+    /**
+     * Запрашивает с сервера список страниц для левого меню
+     */
+    public getChannels(lastVieved: string, callback: Function) {
+        const params = (new HttpParams())
+            .append('cmd',  'get_channels')
+            .append('lv',   lastVieved);
+
+        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
+            input => {
+                this.logInput(input);
+                if (callback) {
+                    callback(input);
+                }
+            },
+            (err: HttpErrorResponse) => {
+                console.error(err.error);
+            }
+        );
+    }
+
+    private logInput(input: object) {
         console.log('⯇ ' + JSON.stringify(input));
     }
 

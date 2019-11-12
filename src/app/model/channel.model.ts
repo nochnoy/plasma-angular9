@@ -4,18 +4,18 @@ import { Thread } from './thread.model';
 export class Channel {
 
     private threads: Array<Thread>;
-    private threadsById:  Map<number, Thread>;
-    
-    public deserialize(input:any) {
-        let i:number;
-        let j:number;
+    private threadsById: Map<number, Thread>;
+
+    public deserialize(input: any) {
+        let i: number;
+        let j: number;
         let rawMessage: any;
         let rawChildren: Array<any>;
-        let t:Thread;
-        let threadId:number;
-        let threadsById = new Map<number, Thread>();
-        let digest:Thread;
-        let starredTrees = new Array<Thread>();
+        let t: Thread;
+        let threadId: number;
+        const threadsById = new Map<number, Thread>();
+        let digest: Thread;
+        const starredTrees = new Array<Thread>();
 
         this.threads = new Array<Thread>();
 
@@ -35,7 +35,7 @@ export class Channel {
 
         // Бежим по тредам, сортируем их внутренности и выбираем звезданутые
 
-        for (i = 0; i < this.threads.length; i++) { 
+        for (i = 0; i < this.threads.length; i++) {
             t = this.threads[i];
             t.sort();
             if (t.root) {
@@ -44,7 +44,7 @@ export class Channel {
                 }
                 if (t.starred.length) {
                     starredTrees.push(t);
-                }    
+                }
             } else {
                 console.warn('Ignoring child of unexistent root message ' + t.rootId);
             }
@@ -65,7 +65,7 @@ export class Channel {
 
         // Сортируем канал - вверху дайджесты, дальше всё по убыванию id
 
-        this.threads.sort((a:Thread, b:Thread):number => {
+        this.threads.sort((a: Thread, b: Thread): number => {
             if (a.isDigest && !b.isDigest) {
                 return -1;
             } else if (!a.isDigest && b.isDigest) {
@@ -87,7 +87,7 @@ export class Channel {
                     return 0;
                 }
             }
-        })
-        
+        });
+
     }
 }
