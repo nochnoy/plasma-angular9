@@ -1,8 +1,50 @@
 <?
 
-function sqlerr(){
+// Добавляет json'ину в $outputBuffer
+function output($s) {
+    global $outputBuffer;
+    array_push($outputBuffer, $s);
+}
+
+// Склеивает все json'ы в буфере $outputBuffer и возвращает клиенту
+function flushOutputBuffer() {
+    global $outputBuffer;
+    echo('{commands: [' . implode(",", $outputBuffer) . ']}');
+}
+
+// Возвращает долговременный ключ сессии, сохранённый в куках
+function getCookieKey() {
+    $key = $_COOKIE[COOKIE_KEY_CODE];
+    if (!empty($key)) {
+        // Защитимся от кулхацкеров
+        $key = str_replace('"', '', $key);
+        $key = str_replace("'", '', $key);
+        $key = str_replace("\\", '', $key);
+    }
+    return $key;
+}
+
+// Генерирует и сохраняет в куках долговременный ключ сессии. Возвращает его.
+function createCookieKey($userId) {
+    $oneWeek = (3600 * (24 * 7));
+    $key = guid();
+    setcookie(COOKIE_KEY_CODE, $key, time() + $oneWeek, '', DOMAIN_FOR_COOKIES);
+    mysql_query('UPDATE tbl_users SET logkey="' . $key . '", time_logged = NOW() WHERE id_user=' . $userId. ' LIMIT 1');
+    sqlerr();
+    return $key;
+}
+
+// В выдаче появится текст sql-ошибки если она произошла
+function sqlerr() {
 	$s = mysql_error();
-	if (strlen($s) > 0) echo($s);
+    if (strlen($s) > 0) {
+        echo($s);
+    }
+}
+
+function guid(){
+    //mt_srand(1);
+    return sprintf('%04X%04X-%04X-%04X-%04X-%04X%04X%04X', mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(16384, 20479), mt_rand(32768, 49151), mt_rand(0, 65535), mt_rand(0, 65535), mt_rand(0, 65535));
 }
 
 // Подготавливаем текст из бд для всовывания в json

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Message } from '../model/message.model';
-import { TopSecret } from '../model/top-secret';
+import { Observable, Subject, BehaviorSubject } from "rxjs";
+
+import { Message } from '@model/message.model';
+import { TopSecret } from '@model/top-secret';
 
 @Injectable()
 export class MessageService {
@@ -12,11 +14,44 @@ export class MessageService {
 
     private headers: HttpHeaders;
 
+    public get status() {
+        return this._status;
+    }
+    public set status(status: SessionStatus) {
+        this._status = status;
+        this.statusSubject.next(status);
+    }
+    private _status;
+    public statusSubject = new Subject<SessionStatus>();
+    public get isAuthorized():boolean {
+        return this.status == SessionStatus.AUTHORIZED;
+    }
+
     constructor(
         private http: HttpClient
     ) {
         this.headers = new HttpHeaders();
         this.headers = this.headers.set('Content-Type', 'application/json; charset=utf-8');
+    }
+
+    /**
+     * Вызывается при старте приложения. Лезет на сервер, пытается авторизоваться по ключу.
+     */
+    public startSession()
+    {
+        this.status = SessionStatus.PENDING;
+
+        const params = (new HttpParams())
+            .append('cmd',  'start_session');
+
+        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
+            input => {
+
+            },
+            (err: HttpErrorResponse) => {
+                console.error(err.error);
+            }
+        );
     }
 
     /**
@@ -88,4 +123,10 @@ export class MessageService {
         console.log('⯇ ' + JSON.stringify(input));
     }
 
+}
+
+export enum SessionStatus {
+    PENDING = 0,
+    UNAUTHORIZED = 2,
+    AUTHORIZED = 3,
 }

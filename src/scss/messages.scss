@@ -19,7 +19,8 @@
 	min-width: 200px;
 	padding: 0px;
 	margin: 0px;
-	margin-bottom: 9px;
+    margin-bottom: 9px;
+    overflow-wrap: break-word; /* !не хочу чтобы длинные ссылки распирали страницу */
 }
 
 /* Ссылка "раскрыть ветку" */ 
