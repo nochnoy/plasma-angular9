@@ -1,20 +1,27 @@
 <?
 
-// Добавляет json'ину в $outputBuffer
-function output($s) {
+// Юзер авторизован?
+function isAuthorized() {
+    global $userId;
+    return !empty($userId);
+}
+
+// Добавляет команду в $outputBuffer
+// В разультирующем json'е она будет лежать в поле под названием $command
+function respond($command, $json) {
     global $outputBuffer;
-    array_push($outputBuffer, $s);
+    array_push($outputBuffer, '"' . $command . '":' . $json);
 }
 
 // Склеивает все json'ы в буфере $outputBuffer и возвращает клиенту
-function flushOutputBuffer() {
+function sendResponce() {
     global $outputBuffer;
-    echo('{commands: [' . implode(",", $outputBuffer) . ']}');
+    echo('{' . implode(",", $outputBuffer) . '}');
 }
 
 // Возвращает долговременный ключ сессии, сохранённый в куках
 function getCookieKey() {
-    $key = $_COOKIE[COOKIE_KEY_CODE];
+    $key = @$_COOKIE[COOKIE_KEY_CODE];
     if (!empty($key)) {
         // Защитимся от кулхацкеров
         $key = str_replace('"', '', $key);

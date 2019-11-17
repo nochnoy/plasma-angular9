@@ -35,6 +35,40 @@ export class MessageService {
     }
 
     /**
+     * Команда серверу
+     */
+    public sendCommand(commandName:string, params:object, callback: Function) {
+        let httpParams = (new HttpParams());
+        httpParams = httpParams.append('cmd',  commandName);
+
+        let paramsS = '';
+        for (let key in params) {
+            httpParams = httpParams.append(key, params[key]);
+            paramsS += ' ' + key + '=' + params[key];
+        }
+
+        console.log('▶ '+TopSecret.ApiPath + '/' + commandName + ':' + paramsS);
+
+        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params: httpParams, responseType: 'text'}).subscribe(
+            input => {
+                console.log('◀ ' + input);
+                try {
+                    let result = JSON.parse(input);
+                    if (callback) {
+                        callback(result);
+                    }    
+                }
+                catch(e) {
+                    result = {"error": "JSON is not parseable: " + input};
+                }
+            },
+            (err: HttpErrorResponse) => {
+                console.error('HTTP Error: ' + err.url + ': ' + err.message);
+            }
+        );
+    }
+
+    /**
      * Вызывается при старте приложения. Лезет на сервер, пытается авторизоваться по ключу.
      */
     public startSession()
@@ -42,7 +76,7 @@ export class MessageService {
         this.status = SessionStatus.PENDING;
 
         const params = (new HttpParams())
-            .append('cmd',  'start_session');
+            .append('cmd',  'start');
 
         this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
             input => {
@@ -65,7 +99,6 @@ export class MessageService {
 
         this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
             input => {
-                this.logInput(input);
                 if (callback) {
                     callback(input);
                 }
@@ -80,47 +113,14 @@ export class MessageService {
      * Запрашивает с сервера сообщения одного треда
      */
     public getThread(threadId: number, lastVieved: string, callback: Function) {
-        const params = (new HttpParams())
-            .append('cmd',  'get_thread')
-            .append('tid',  threadId.toString())
-            .append('lv',   lastVieved);
-
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
-            input => {
-                this.logInput(input);
-                if (callback) {
-                    callback(input);
-                }
-            },
-            (err: HttpErrorResponse) => {
-                console.error(err.error);
-            }
-        );
+        this.sendCommand('get_thread', {tid: threadId.toString(), lv: lastVieved}, callback);
     }
 
     /**
      * Запрашивает с сервера список страниц для левого меню
      */
     public getChannels(lastVieved: string, callback: Function) {
-        const params = (new HttpParams())
-            .append('cmd',  'get_channels')
-            .append('lv',   lastVieved);
-
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
-            input => {
-                this.logInput(input);
-                if (callback) {
-                    callback(input);
-                }
-            },
-            (err: HttpErrorResponse) => {
-                console.error(err.error);
-            }
-        );
-    }
-
-    private logInput(input: object) {
-        console.log('⯇ ' + JSON.stringify(input));
+        this.sendCommand('get_channels', {lv: lastVieved}, callback);
     }
 
 }

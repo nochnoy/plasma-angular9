@@ -13,69 +13,41 @@ include("commands.php");
 mysql_query("SET CHARACTER SET 'cp1251'");
 mysql_query("SET NAMES 'utf8'");
 
-// Массив, в который набъются json'ы из всех выполнившихся команд. 
+session_start();
+
+// Команда юзера
+
+$command = @$_REQUEST['cmd'];
+
+// Массив, в который набъются json'ы ответов всех выполнившихся команд. 
 // Потом их склеим и выдадим клиенту.
 
-$outputBuffer = array(); 
+$outputBuffer = array();
 
-// Достаём id юзера из сессии
+// Команды, работающие без авторизации
 
-session_start();
-//$_SESSION['plasmax_user_id'] = 0; // <<<<<<<<<<<<<<<<<<<<<<<<
-$userId = @$_SESSION['plasmax_user_id'];
-
-// Если сессия протухла - пытаемся создаёть её по ключу в куках
-
-if (empty($userId)) {
-    $key = getCookieKey();
-
-    //$key = '39DF8C67-639C-446B-8F81-42FB3F5893F1'; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-    if (isset($key)) {
-        $result = mysql_query('SELECT * FROM tbl_users WHERE logkey="'.$key.'" LIMIT 1');
-        sqlerr();
-
-        if (mysql_num_rows($result) > 0) {
-            $rows = mysql_fetch_assoc($result);
-            $userId = intval($rows['id_user']);
-            $_SESSION['plasmax_user_id'] = $userId;
-
-            // Ключ меняем
-            $key = createCookieKey($userId);
-
-            echo ('{"status": "authorized"}');
-        }
+/*if(isset($_COOKIE["contortion_key"])) {
+    $result = mysql_query("SELECT  * FROM tbl_users WHERE logkey='" . $_COOKIE["contortion_key"] . "'");
+    sqlerr();
+    if (mysql_num_rows($result)>0) {
+        $this->buildSession(mysql_fetch_assoc($result));
     }
-}
+}*/
 
-// Если так и не нашли юзера
+// Проверяем, авторизован ли юзер
+// Если нет - отдаём клиенту ответы команд и сдыхаем
 
-if (empty($userId)) {
-    output('{"status": "unauthorized"}');
+cmdCheckSessionStatus();
+if (!isAuthorized()) {
+    respond('status', '{"authorized": "false"}');
+    sendResponce();
     die;
 }
 
-// Выполняем команды
+// Если авторизовались - выполняем команды для авторизованных юзеров
 
-switch(@$_REQUEST['cmd']) {
+switch ($command) {
 
-    // логинимся по ключу в куках
-    case 'start_session':
-
-        echo ('{"session":' . $uid . '}');
-        break;
-        
-    // Логинимся логином и паролем
-    case 'auth':
-        if(isset($_COOKIE["contortion_key"])) {
-            $result = mysql_query("SELECT  * FROM tbl_users WHERE logkey='".$_COOKIE["contortion_key"]."'");
-            sqlerr();
-            if (mysql_num_rows($result)>0) {
-                $this->buildSession(mysql_fetch_assoc($result));
-            }
-        }
-        break;
-        
     case 'log_off':
         cmdLogOff();
         break;
@@ -93,13 +65,13 @@ switch(@$_REQUEST['cmd']) {
         break;
 
 	default:
-		echo('{"error":"Unknown command"}');
+        respond($command, '{"error":"Unknown command `' . $command . '`"}');
 		break;
 
 }
 
-// Строим результирующее сообщение для клиента
+// Отдаём клиенту ответы команд
 
-flushOutputBuffer();
+sendResponce();
 
 ?>

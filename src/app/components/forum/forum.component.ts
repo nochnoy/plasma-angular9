@@ -47,7 +47,7 @@ private tryLoad() {
     if (this._id && this._isReady) {
         this.messagesService.getChannel(this.id, '2019-09-22 22:21:06', (input) => {
             this.channel = new Channel();
-            this.channel.deserialize(input);
+            this.channel.deserialize(input['channel']);
         });
     }
 }
@@ -59,7 +59,7 @@ onExpandClick(event, thread: Thread) {
         thread.isExpanded = true;
     } else {
         this.messagesService.getThread(thread.rootId, '2019-09-22 22:21:06', (input) => {
-            thread.addMessages(input.messages);
+            thread.addMessages(input.thread.messages);
             thread.isExpanded = true;
         });
     }
