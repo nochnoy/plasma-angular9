@@ -21,7 +21,7 @@ export class MessageService {
         this._status = status;
         this.statusSubject.next(status);
     }
-    private _status;
+    private _status:SessionStatus = SessionStatus.PENDING;
     public statusSubject = new Subject<SessionStatus>();
     public get isAuthorized():boolean {
         return this.status == SessionStatus.AUTHORIZED;
@@ -50,22 +50,48 @@ export class MessageService {
         console.log('▶ '+TopSecret.ApiPath + '/' + commandName + ':' + paramsS);
 
         this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params: httpParams, responseType: 'text'}).subscribe(
-            input => {
-                console.log('◀ ' + input);
+            json => {
+                console.log('◀ ' + json);
+                let result: any = null;
                 try {
-                    let result = JSON.parse(input);
-                    if (callback) {
-                        callback(result);
-                    }    
+                    result = JSON.parse(json);
                 }
                 catch(e) {
-                    result = {"error": "JSON is not parseable: " + input};
+                    result = {"error": "JSON is not parseable: " + json};
+                }
+
+                // Сначала даём понюхать глобальному хуку
+                if (result)  {
+                    this.globalCommandHook(result);
+                }
+                
+                // Потом инициатору запроса
+                if (result && callback) {
+                    callback(result);
                 }
             },
             (err: HttpErrorResponse) => {
                 console.error('HTTP Error: ' + err.url + ': ' + err.message);
             }
         );
+    }
+
+    /**
+     * Глобальный хук сообщений. 
+     * Дёргается каждый раз, когда с сервера приходят данные. 
+     * Тут можно ловить события типа разавторизации.
+     */
+    private globalCommandHook(input:any) {
+
+        // Проверим авторизацию
+        if (input.status) {
+            if (input.status.authorized) {
+                this.status = SessionStatus.AUTHORIZED;
+            } else {
+                this.status = SessionStatus.UNAUTHORIZED;
+            }
+        }
+
     }
 
     /**

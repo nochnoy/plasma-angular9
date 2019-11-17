@@ -21,7 +21,6 @@ export class AppGuard implements CanActivate {
                 const url = 'guest';
                 const tree: UrlTree = this.router.parseUrl(url);
                 return tree;
-                //return false;
 
             case SessionStatus.PENDING:
                 const subj = new Subject<boolean>()
