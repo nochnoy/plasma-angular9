@@ -18,10 +18,12 @@ export class MessageService {
         return this._status;
     }
     public set status(status: SessionStatus) {
-        this._status = status;
-        this.statusSubject.next(status);
+        if (status != this._status) {
+            this._status = status;
+            this.statusSubject.next(status);
+        }
     }
-    private _status:SessionStatus = SessionStatus.PENDING;
+    private _status:SessionStatus = SessionStatus.UNITIALIZED;
     public statusSubject = new Subject<SessionStatus>();
     public get isAuthorized():boolean {
         return this.status == SessionStatus.AUTHORIZED;
@@ -30,14 +32,16 @@ export class MessageService {
     constructor(
         private http: HttpClient
     ) {
-        this.headers = new HttpHeaders();
-        this.headers = this.headers.set('Content-Type', 'application/json; charset=utf-8');
+        this.headers = new HttpHeaders({
+            'Content-Type': 'application/json; charset=utf-8',
+        });
     }
 
     /**
      * Команда серверу
      */
-    public sendCommand(commandName:string, params:object, callback: Function) {
+    public sendCommand(commandName:string, params:object, callback: Function = null) {
+
         let httpParams = (new HttpParams());
         httpParams = httpParams.append('cmd',  commandName);
 
@@ -47,10 +51,21 @@ export class MessageService {
             paramsS += ' ' + key + '=' + params[key];
         }
 
+        let postParams = 
+
         console.log('▶ '+TopSecret.ApiPath + '/' + commandName + ':' + paramsS);
 
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params: httpParams, responseType: 'text'}).subscribe(
-            json => {
+        this.http.post(
+            TopSecret.ApiPath, 
+            null, 
+            {
+                headers: this.headers, 
+                params: httpParams, 
+                responseType: 'text', 
+                withCredentials: true // With Credentials!
+            }
+        ).subscribe(
+            (json) => {
                 console.log('◀ ' + json);
                 let result: any = null;
                 try {
@@ -115,24 +130,26 @@ export class MessageService {
     }
 
     /**
+     * Аутентификация
+     */
+    public login(login:string, password:string, callback: Function = null)
+    {
+        this.sendCommand('login', {login: login, password:password}, callback);
+    }
+
+    /**
+     * Аутентификация
+     */
+    public logOut(callback: Function = null)
+    {
+        this.sendCommand('log_out', {}, callback);
+    }
+
+    /**
      * Запрашивает с сервера сообщения канала
      */
     public getChannel(channelId: number, lastVieved: string, callback: Function) {
-        const params = (new HttpParams())
-            .append('cmd',  'get_channel')
-            .append('cid',  channelId.toString())
-            .append('lv',   lastVieved);
-
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
-            input => {
-                if (callback) {
-                    callback(input);
-                }
-            },
-            (err: HttpErrorResponse) => {
-                console.error(err.error);
-            }
-        );
+        this.sendCommand('get_channel', {cid: channelId.toString(), lv: lastVieved}, callback);
     }
 
     /**
@@ -152,7 +169,8 @@ export class MessageService {
 }
 
 export enum SessionStatus {
-    PENDING = 0,
-    UNAUTHORIZED = 2,
-    AUTHORIZED = 3,
+    UNITIALIZED = -1,
+    UNAUTHORIZED = 0,
+    PENDING = 1,
+    AUTHORIZED = 2,
 }

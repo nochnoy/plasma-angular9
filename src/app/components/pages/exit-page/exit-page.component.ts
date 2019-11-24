@@ -6,25 +6,20 @@ import {map} from 'rxjs/operators';
 import { MessageService } from '@app/services/message.service';
 
 @Component({
-  selector: 'guest-page',
-  templateUrl: './guest-page.component.html',
-  styleUrls: ['./guest-page.component.scss']
+  selector: 'exit-page',
+  templateUrl: './exit-page.component.html',
+  styleUrls: ['./exit-page.component.scss']
 })
-export class GuestPageComponent implements OnInit {
+export class ExitPageComponent implements OnInit {
 
     constructor(
         private service: MessageService,
     ) { }
 
-    public loginValue: string = 'marat';
-    public passwordValue: string = 'parolchegdlyaplazmy';
-
     ngOnInit() {
-
-    }
-
-    onSubmit() {
-        this.service.login(this.loginValue, this.passwordValue);
+        setTimeout(() => {
+            this.service.logOut();
+        }, 500);
     }
 
 }

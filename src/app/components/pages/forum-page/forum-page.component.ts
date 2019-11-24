@@ -12,7 +12,9 @@ export class ForumPageComponent implements OnInit {
 
     public forumId: number;
 
-    constructor(private route: ActivatedRoute) { }
+    constructor(
+        private route: ActivatedRoute
+    ) { }
 
     ngOnInit() {
         this.route.params.pipe(map(p => p.id))

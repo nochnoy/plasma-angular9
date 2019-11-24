@@ -46,8 +46,11 @@ ngOnInit() {
 private tryLoad() {
     if (this._id && this._isReady) {
         this.messagesService.getChannel(this.id, '2019-09-22 22:21:06', (input) => {
-            this.channel = new Channel();
-            this.channel.deserialize(input['channel']);
+            let channelInput = input['channel'];
+            if (channelInput) {
+                this.channel = new Channel();
+                this.channel.deserialize(channelInput);
+            }
         });
     }
 }

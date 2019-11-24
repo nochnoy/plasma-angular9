@@ -3,11 +3,12 @@ import { MessageService } from '../services/message.service';
 import { Page } from '../model/page.model';
 
 @Component({
-    selector: 'main-menu',
+    selector: 'menu',
     template: `
         <ul *ngFor="let page of pages">
             <li><a [routerLink]="['forum/', page.id]" routerLinkActive="active">{{page.name}}</a></li>
         </ul>
+        <a [routerLink]="'exit'">Выход</a>
     `,
     styles: [`
         :host {
@@ -20,7 +21,7 @@ import { Page } from '../model/page.model';
         }
     `]
 })
-export class MainMenuComponent {
+export class MenuComponent {
 
     public pages = new Array<Page>();
 
@@ -31,13 +32,16 @@ export class MainMenuComponent {
     ngOnInit() {
         this.pages.length = 0;
         this.messagesService.getChannels('2019-10-12 23:45:18', (input) => {
-            var a = input['channels']['channels'] as Array<any>;
-            let page: Page;
-            for (const item of a) {
-                page = new Page();
-                page.id = parseInt(item['id']);
-                page.name = item['name'];
-                this.pages.push(page);
+            var channelsInput = input['channels'];
+            if (channelsInput) {
+                var a = channelsInput.channels as Array<any>;
+                let page: Page;
+                for (const item of a) {
+                    page = new Page();
+                    page.id = parseInt(item['id']);
+                    page.name = item['name'];
+                    this.pages.push(page);
+                }
             }
         });
     }

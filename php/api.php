@@ -1,10 +1,7 @@
 <?
 error_reporting(E_ALL);
 
-header('Content-Type: application/json; charset=UTF-8');
-header("Access-Control-Allow-Headers: *");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST, GET");
+session_start();
 
 include("top_secret.php");
 include("functions.php");
@@ -12,8 +9,6 @@ include("commands.php");
 
 mysql_query("SET CHARACTER SET 'cp1251'");
 mysql_query("SET NAMES 'utf8'");
-
-session_start();
 
 // Команда юзера
 
@@ -26,20 +21,29 @@ $outputBuffer = array();
 
 // Команды, работающие без авторизации
 
-/*if(isset($_COOKIE["contortion_key"])) {
-    $result = mysql_query("SELECT  * FROM tbl_users WHERE logkey='" . $_COOKIE["contortion_key"] . "'");
-    sqlerr();
-    if (mysql_num_rows($result)>0) {
-        $this->buildSession(mysql_fetch_assoc($result));
-    }
-}*/
+switch ($command) {
+
+    case 'login':
+        cmdLogin($_REQUEST['login'], $_REQUEST['password']);
+        break;
+
+    case 'log_out':
+        cmdLogOff();
+        sendResponce();
+        die;
+        break;
+
+}
 
 // Проверяем, авторизован ли юзер
-// Если нет - отдаём клиенту ответы команд и сдыхаем
 
 cmdCheckSessionStatus();
-if (!isAuthorized()) {
-    respond('status', '{"authorized": "false"}');
+
+if (isAuthorized()) {
+    respond('status', '{"authorized": true}');
+} else {
+    // Если нет - отдаём клиенту ответы команд и умираем
+    respond('status', '{"authorized": false}');
     sendResponce();
     die;
 }
@@ -47,10 +51,6 @@ if (!isAuthorized()) {
 // Если авторизовались - выполняем команды для авторизованных юзеров
 
 switch ($command) {
-
-    case 'log_off':
-        cmdLogOff();
-        break;
 
 	case 'get_channel':
         cmdGetChannel($_REQUEST['cid'], $_REQUEST['lv']);
@@ -63,11 +63,6 @@ switch ($command) {
     case 'get_channels':
         cmdGetChannels($_REQUEST['lv']);
         break;
-
-	default:
-        respond($command, '{"error":"Unknown command `' . $command . '`"}');
-		break;
-
 }
 
 // Отдаём клиенту ответы команд

@@ -10,13 +10,28 @@ function isAuthorized() {
 // В разультирующем json'е она будет лежать в поле под названием $command
 function respond($command, $json) {
     global $outputBuffer;
-    array_push($outputBuffer, '"' . $command . '":' . $json);
+    array_push($outputBuffer, '"'.$command.'":'.$json);
 }
 
 // Склеивает все json'ы в буфере $outputBuffer и возвращает клиенту
 function sendResponce() {
     global $outputBuffer;
-    echo('{' . implode(",", $outputBuffer) . '}');
+
+    header('Content-Type: application/json; charset=UTF-8');
+    header("Access-Control-Allow-Headers: Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
+    header("Access-Control-Allow-Methods: POST, GET");
+    header("Access-Control-Allow-Credentials: true");
+    header("Access-Control-Allow-Origin: http://localhost:4200"); // CORS    
+
+    echo('{'.implode(",", $outputBuffer).'}');
+}
+
+// В сессию записываем id юзера, а в куки - новый куки-ключ
+function initSession($uid) {
+    global $userId;         
+    $userId = $uid;
+    $_SESSION['plasmax_user_id'] = $uid;
+    createCookieKey($uid);
 }
 
 // Возвращает долговременный ключ сессии, сохранённый в куках
@@ -35,10 +50,18 @@ function getCookieKey() {
 function createCookieKey($userId) {
     $oneWeek = (3600 * (24 * 7));
     $key = guid();
+
+    //, ['samesite' => 'Lax']
     setcookie(COOKIE_KEY_CODE, $key, time() + $oneWeek, '', DOMAIN_FOR_COOKIES);
-    mysql_query('UPDATE tbl_users SET logkey="' . $key . '", time_logged = NOW() WHERE id_user=' . $userId. ' LIMIT 1');
+
+    mysql_query('UPDATE tbl_users SET logkey="'.$key.'", time_logged = NOW() WHERE id_user='.$userId.' LIMIT 1');
     sqlerr();
     return $key;
+}
+
+// Удаляет в куках долговременный ключ сессии
+function clearCookieKey() {
+    setcookie(COOKIE_KEY_CODE, "", time() - 3600, '', DOMAIN_FOR_COOKIES);
 }
 
 // В выдаче появится текст sql-ошибки если она произошла
@@ -99,7 +122,7 @@ function getChannelJson($channelId, $lastViewed) {
 	$sql  = 'SELECT';
 	$sql .= ' id_message, id_parent, id_first_parent, children, nick, CONCAT(subject, " ", message), time_created, children';
 	$sql .= ' FROM tbl_messages';
-	$sql .= ' WHERE id_place=' . $channelId . ' AND id_parent=0';
+	$sql .= ' WHERE id_place='.$channelId.' AND id_parent=0';
 	$sql .= ' ORDER BY time_created DESC';
 	$sql .= ' LIMIT 50';
 	$result = mysql_query($sql);
@@ -111,7 +134,7 @@ function getChannelJson($channelId, $lastViewed) {
 
 	// Если есть звезданутые сообщения и их не слишком много, получаем полностью все ветки, в которых есть звезданутые
 
-	$resultStarredCount = mysql_query('SELECT COUNT(id_message) FROM tbl_messages WHERE id_place=' . $channelId . ' AND time_created >= "' . $lastViewed . '"');
+	$resultStarredCount = mysql_query('SELECT COUNT(id_message) FROM tbl_messages WHERE id_place='.$channelId.' AND time_created >= "'.$lastViewed.'"');
 	$row = mysql_fetch_array($resultStarredCount);
 	if ($row[0] > 0 && $row[0] < 20) { // Если звезданутых больше 20ти значит юзер не был здесь слишком долго и дайджестов не получит.
 
@@ -119,7 +142,7 @@ function getChannelJson($channelId, $lastViewed) {
 		$sql .= ' id_message, id_parent, id_first_parent, children, nick, CONCAT(subject, " ", message), time_created, -1'; 
 		$sql .= ' FROM tbl_messages';
 		$sql .= ' WHERE';
-		$sql .= ' (id_first_parent<>0 && id_first_parent IN (SELECT id_first_parent FROM tbl_messages WHERE id_place=' . $channelId . ' AND time_created >= "' . $lastViewed . '"))';
+		$sql .= ' (id_first_parent<>0 && id_first_parent IN (SELECT id_first_parent FROM tbl_messages WHERE id_place='.$channelId.' AND time_created >= "'.$lastViewed.'"))';
 		$result = mysql_query($sql);
 		sqlerr();
 
@@ -130,7 +153,7 @@ function getChannelJson($channelId, $lastViewed) {
 
 	// Выводим всё полученное в JSON
 
-	return '[' . buildMessagesJson($a, $lastViewed) . ']';
+	return '['.buildMessagesJson($a, $lastViewed).']';
 }
 
 // Возвращает JSON с сообщениями ветки. Внимание, рутовое сообщение не присылается!
@@ -143,7 +166,7 @@ function getThreadJson($threadId, $lastViewed) {
 	$sql  = 'SELECT';
 	$sql .= ' id_message, id_parent, id_first_parent, children, nick, CONCAT(subject, " ", message), time_created, children';
 	$sql .= ' FROM tbl_messages';
-	$sql .= ' WHERE id_first_parent=' . $threadId;
+	$sql .= ' WHERE id_first_parent='.$threadId;
 	$sql .= ' ORDER BY time_created DESC';
 	$result = mysql_query($sql);
 	sqlerr();
@@ -154,7 +177,7 @@ function getThreadJson($threadId, $lastViewed) {
 
 	// Выводим всё полученное в JSON
 
-	return '[' . buildMessagesJson($a, $lastViewed) . ']';
+	return '['.buildMessagesJson($a, $lastViewed).']';
 }
 
 // Получает массив row'ов сообщений
@@ -173,16 +196,16 @@ function buildMessagesJson($a, $lastViewed) {
 		$s .= '"id":'				. $row[0];								// id 
 		$s .= ',"pid":'				. $row[1];								// parent id
 		$s .= ',"tid":'				. $tid;								    // thread id
-		$s .= ',"n":"'				. $row[4] . '"';						// nick
-		$s .= ',"t":"'				. jsonifyMessageText($row[5]) . '"';	// text
-		$s .= ',"d":"'				. $row[6] . '"';						// time_created
+		$s .= ',"n":"'				. $row[4].'"';						    // nick
+		$s .= ',"t":"'				. jsonifyMessageText($row[5]).'"';	    // text
+		$s .= ',"d":"'				. $row[6].'"';						    // time_created
 
 		if ($row[6] > $lastViewed) {
 			$s .= ',"star":' . 1;											// Есть ли звёздочка
 		}
 
 		if ($row[7] > 0) {
-			$s .= ',"cm":"' . $row[7] . '"';								// Количество детей (только у верхнеуровневых)
+			$s .= ',"cm":"'.$row[7].'"';								    // Количество детей (только у верхнеуровневых)
 		}
 
 		$s .= '}';
@@ -215,15 +238,15 @@ function getChannelsJson() {
         $s .= '{';
         $s .= '"id":'				. $row[0];								// id 
         $s .= ',"pid":'				. $row[1];								// parent id
-        $s .= ',"name":"'		    . jsonifyMessageText($row[2]) . '"';	// name
-        $s .= ',"desc":"'			. jsonifyMessageText($row[3]) . '"';	// description
-        $s .= ',"d":"'				. $row[4] . '"';						// time_created
-        $s .= ',"type":"'			. $row[5] . '"';						// type
+        $s .= ',"name":"'		   .jsonifyMessageText($row[2]).'"';	// name
+        $s .= ',"desc":"'			. jsonifyMessageText($row[3]).'"';	// description
+        $s .= ',"d":"'				. $row[4].'"';						// time_created
+        $s .= ',"type":"'			. $row[5].'"';						// type
         $s .= '}';
 
 	}
 
-	return '[' . $s . ']';
+	return '['.$s.']';
 }
 
 ?>
