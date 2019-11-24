@@ -4,6 +4,7 @@ import { Observable, Subject, BehaviorSubject } from "rxjs";
 
 import { Message } from '@model/message.model';
 import { TopSecret } from '@model/top-secret';
+import { Page } from '../model/page.model';
 
 @Injectable()
 export class MessageService {
@@ -28,6 +29,9 @@ export class MessageService {
     public get isAuthorized():boolean {
         return this.status == SessionStatus.AUTHORIZED;
     }
+
+    // Список страниц в главном меню
+    public menuPages = new Array<Page>();
 
     constructor(
         private http: HttpClient
@@ -98,7 +102,9 @@ export class MessageService {
      */
     private globalCommandHook(input:any) {
 
+        // status
         // Проверим авторизацию
+
         if (input.status) {
             if (input.status.authorized) {
                 this.status = SessionStatus.AUTHORIZED;
@@ -107,6 +113,20 @@ export class MessageService {
             }
         }
 
+        // channels
+        // Пришёл список каналов для главного меню
+
+        if (input.channels) {
+            this.menuPages.length = 0;
+            var a = input.channels.channels as Array<any>;
+            let page: Page;
+            for (const item of a) {
+                page = new Page();
+                page.id = parseInt(item['id']);
+                page.name = item['name'];
+                this.menuPages.push(page);
+            }
+        }
     }
 
     /**
@@ -115,18 +135,7 @@ export class MessageService {
     public startSession()
     {
         this.status = SessionStatus.PENDING;
-
-        const params = (new HttpParams())
-            .append('cmd',  'start');
-
-        this.http.post(TopSecret.ApiPath, null, {headers: this.headers, params}).subscribe(
-            input => {
-
-            },
-            (err: HttpErrorResponse) => {
-                console.error(err.error);
-            }
-        );
+        this.sendCommand('start', {});
     }
 
     /**
@@ -134,7 +143,13 @@ export class MessageService {
      */
     public login(login:string, password:string, callback: Function = null)
     {
-        this.sendCommand('login', {login: login, password:password}, callback);
+        this.sendCommand('login', {login: login, password:password}, (result) => {
+            if (result.status && result.status.authorized) {
+                this.startSession();
+                if (callback)
+                    callback();
+            }
+        });
     }
 
     /**

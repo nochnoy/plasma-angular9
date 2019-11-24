@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient, HttpParams, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 
 import { MessageService, SessionStatus } from './services/message.service';
 
@@ -8,32 +7,54 @@ import { MessageService, SessionStatus } from './services/message.service';
     selector: 'app-root',
     template: `
         <div class="main">
-            <menu></menu>
-            <router-outlet></router-outlet>
+
+            <ng-container *ngIf="isAuthorized">
+                <menu></menu>
+                <router-outlet></router-outlet>
+            </ng-container>
+
+            <ng-container *ngIf="!isAuthorized">
+                <input [(ngModel)]="loginValue">
+                <input [(ngModel)]="passwordValue" type="password">
+                <button (click)="onLoginClick()">Login</button>
+            </ng-container>
+            
         </div>
     `
 })
 export class AppComponent {
+
+    public isAuthorized = false;
+
+    public loginValue: string = 'marat';
+    public passwordValue: string = 'parolchegdlyaplazmy';
+
     constructor(
         public router: Router,
-        public messagesService: MessageService,
+        public service: MessageService,
     ) { }
 
     ngOnInit() {
-
-        this.messagesService.statusSubject.subscribe((status) => {
+        this.service.statusSubject.subscribe((status) => {
             switch (status) {
 
                 case SessionStatus.UNAUTHORIZED:
-                    this.router.navigate(['/guest']);
+                    this.isAuthorized = false;
+                    //this.router.navigate(['/guest']);
                     break;
 
                 case SessionStatus.AUTHORIZED:
+                    this.isAuthorized = true;
                     this.router.navigate(['/forum/1']);
                     break;
 
             }
         });
 
+        this.service.startSession();
+    }
+
+    onLoginClick() {
+        this.service.login(this.loginValue, this.passwordValue);
     }
 }

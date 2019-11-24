@@ -3,6 +3,12 @@ error_reporting(E_ALL);
 
 session_start();
 
+header('Content-Type: application/json; charset=UTF-8');
+header("Access-Control-Allow-Headers: Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With, X-Auth-Token");
+header("Access-Control-Allow-Methods: POST, GET");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Origin: http://localhost:4200"); // CORS
+
 include("top_secret.php");
 include("functions.php");
 include("commands.php");
@@ -51,6 +57,10 @@ if (isAuthorized()) {
 // Если авторизовались - выполняем команды для авторизованных юзеров
 
 switch ($command) {
+
+    case 'start':
+        cmdGetChannels('2019-10-12 23:45:18'); // <<<<<<<<<<<<<<<<<<<<<<< сделай нормальный lasviewed
+        break;
 
 	case 'get_channel':
         cmdGetChannel($_REQUEST['cid'], $_REQUEST['lv']);

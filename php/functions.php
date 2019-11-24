@@ -16,13 +16,6 @@ function respond($command, $json) {
 // Склеивает все json'ы в буфере $outputBuffer и возвращает клиенту
 function sendResponce() {
     global $outputBuffer;
-
-    header('Content-Type: application/json; charset=UTF-8');
-    header("Access-Control-Allow-Headers: Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
-    header("Access-Control-Allow-Methods: POST, GET");
-    header("Access-Control-Allow-Credentials: true");
-    header("Access-Control-Allow-Origin: http://localhost:4200"); // CORS    
-
     echo('{'.implode(",", $outputBuffer).'}');
 }
 
