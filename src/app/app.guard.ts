@@ -34,7 +34,6 @@ export class AppGuard implements CanActivate {
                             break;
 
                         case SessionStatus.UNAUTHORIZED:
-                            this.router.navigate(['/guest']);
                             subj.next(false);
                             subj.complete();
                             break;

@@ -40,7 +40,6 @@ export class AppComponent {
 
                 case SessionStatus.UNAUTHORIZED:
                     this.isAuthorized = false;
-                    //this.router.navigate(['/guest']);
                     break;
 
                 case SessionStatus.AUTHORIZED:
