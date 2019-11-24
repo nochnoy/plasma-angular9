@@ -14,9 +14,7 @@ import { MessageService, SessionStatus } from './services/message.service';
             </ng-container>
 
             <ng-container *ngIf="!isAuthorized">
-                <input [(ngModel)]="loginValue">
-                <input [(ngModel)]="passwordValue" type="password">
-                <button (click)="onLoginClick()">Login</button>
+                <gate></gate>
             </ng-container>
             
         </div>
@@ -25,9 +23,6 @@ import { MessageService, SessionStatus } from './services/message.service';
 export class AppComponent {
 
     public isAuthorized = false;
-
-    public loginValue: string = 'marat';
-    public passwordValue: string = 'parolchegdlyaplazmy';
 
     constructor(
         public router: Router,
@@ -44,16 +39,12 @@ export class AppComponent {
 
                 case SessionStatus.AUTHORIZED:
                     this.isAuthorized = true;
-                    this.router.navigate(['/forum/1']);
+                    this.router.navigate(['/forum/1']); // <<<<<<<<<<<<< по идее сервер сам должен направить куда надо
                     break;
 
             }
         });
 
         this.service.startSession();
-    }
-
-    onLoginClick() {
-        this.service.login(this.loginValue, this.passwordValue);
     }
 }

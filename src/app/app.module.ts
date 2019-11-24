@@ -11,6 +11,7 @@ import { AppComponent } from '@app/app.component';
 import { MessagesComponent } from '@app/components/messages.component';
 import { MenuComponent } from '@app/components/menu.component';
 import { ForumComponent } from '@app/components/forum/forum.component';
+import { GateComponent } from '@app/components/gate.component';
 
 import { ForumPageComponent } from '@app/components/pages/forum-page/forum-page.component';
 
@@ -25,6 +26,7 @@ const routes: Routes = [
         MessagesComponent,
         MenuComponent,
         ForumComponent,
+        GateComponent,
 
         ForumPageComponent,
     ],
