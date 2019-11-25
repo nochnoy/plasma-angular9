@@ -4,12 +4,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //	Variables
 
-//$background-color: #F4E5D7; // "Харншин" новый более светлый
-$background-color: #d7cabb; // "Классик" цвет старой плазмы
-
-$text-color: #000000;
-$text-gray-color: #d8cdb5;
-
+@import 'variables.scss';
 @import 'messages';
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,13 +15,13 @@ $text-gray-color: #d8cdb5;
 	padding: 0;
 	border: 0;
 	font-size: 11pt;
-	font-family: 'Roboto', Arial, Tahoma;
+	font-family: 'Roboto', 'Arial', 'Tahoma';
 	color: $text-color;
 	vertical-align: baseline;
 }
 
 body {
-	background-color: $background-color;
+	background-color: $classic-bg-color;
 }
 
 .main {
@@ -34,8 +29,15 @@ body {
 	flex-direction: row;
 	flex-wrap: nowrap;
 	align-items: stretch;
+}
 
-	
+/* фон для залогиненных */
+.insiderbg {
+    background-color: $classic-bg-color;
+}
+/* фон для незалогиненных */
+.outsiderbg {
+    background-color: $browser-bg-color;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

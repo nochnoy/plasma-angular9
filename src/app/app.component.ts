@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { MessageService, SessionStatus } from './services/message.service';
@@ -6,14 +6,14 @@ import { MessageService, SessionStatus } from './services/message.service';
 @Component({
     selector: 'app-root',
     template: `
-        <div class="main">
+        <div class="main" [class.insiderbg]="status==2" [class.outsiderbg]="status!=2">
 
-            <ng-container *ngIf="isAuthorized">
+            <ng-container *ngIf="status==2">
                 <menu></menu>
                 <router-outlet></router-outlet>
             </ng-container>
 
-            <ng-container *ngIf="!isAuthorized">
+            <ng-container *ngIf="status==0">
                 <gate></gate>
             </ng-container>
             
@@ -22,23 +22,23 @@ import { MessageService, SessionStatus } from './services/message.service';
 })
 export class AppComponent {
 
-    public isAuthorized = false;
+    public status: number = SessionStatus.UNITIALIZED;
 
     constructor(
         public router: Router,
         public service: MessageService,
+        private elementRef: ElementRef, private renderer:Renderer2
     ) { }
 
     ngOnInit() {
         this.service.statusSubject.subscribe((status) => {
+            this.status = status;
             switch (status) {
 
                 case SessionStatus.UNAUTHORIZED:
-                    this.isAuthorized = false;
                     break;
 
                 case SessionStatus.AUTHORIZED:
-                    this.isAuthorized = true;
                     this.router.navigate(['/forum/1']); // <<<<<<<<<<<<< по идее сервер сам должен направить куда надо
                     break;
 

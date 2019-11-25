@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, HostListener } from '@angular/core';
 import { MessageService } from '../services/message.service';
 import { Page } from '../model/page.model';
 import { TopSecret } from '@app/model/top-secret';
@@ -22,8 +22,6 @@ import { TopSecret } from '@app/model/top-secret';
 
             width: 100vw;
             height: 100vh;
-
-            background-color: white;
         }
 
         .controls {
@@ -50,6 +48,13 @@ import { TopSecret } from '@app/model/top-secret';
     `]
 })
 export class GateComponent {
+
+    @HostListener('window:keydown', ['$event'])
+    onKeyDown(event) {
+        if (event.code == 'Enter') {
+            this.onLoginClick();
+        }
+    }
 
     public loginValue: string = '';
     public passwordValue: string = '';
