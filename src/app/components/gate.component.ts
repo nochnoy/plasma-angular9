@@ -7,7 +7,7 @@ import { TopSecret } from '@app/model/top-secret';
     selector: 'gate',
     template: `
         <div class="controls">
-            <button (click)="onKppClick()">Кпп</button>
+            <button (click)="onKppClick()">КПП</button>
             <input [(ngModel)]="loginValue">
             <input [(ngModel)]="passwordValue" type="password">
             <button (click)="onLoginClick()">Вход</button>
@@ -43,6 +43,8 @@ import { TopSecret } from '@app/model/top-secret';
             width: 7rem;
             margin-left: 0.3rem;
             color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
             background-color: #d7cabb;
         }
     `]

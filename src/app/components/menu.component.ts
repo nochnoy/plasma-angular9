@@ -5,6 +5,7 @@ import { Page } from '../model/page.model';
 @Component({
     selector: 'menu',
     template: `
+        <div class="logo"></div>
         <ul *ngFor="let page of service.menuPages">
             <li><a [routerLink]="['forum/', page.id]" routerLinkActive="active">{{page.name}}</a></li>
         </ul>
@@ -14,10 +15,31 @@ import { Page } from '../model/page.model';
         :host {
             min-width: 200px;
             min-height: 200px;
-
         }
-        a:active {
-            color: red;
+
+        .logo {
+            position: absolute;
+            z-index: 1;
+
+            width: 146px;
+            height: 133px;
+            background-image: url(assets/logo.gif);
+        }
+
+        ul {
+            position: relative;
+            z-index: 2;
+
+            top: 110px;
+            left: 40px;
+            list-style-type: none;
+        }
+
+        a {
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     `]
 })
