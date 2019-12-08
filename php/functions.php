@@ -16,7 +16,20 @@ function respond($command, $json) {
 // Склеивает все json'ы в буфере $outputBuffer и возвращает клиенту
 function sendResponce() {
     global $outputBuffer;
+    global $logBuffer;
+
+    // добавим логи
+    if (count($logBuffer) > 0) {
+        array_push($outputBuffer, '"log":'.'['.implode(",", $logBuffer).']');
+    }
+
     echo('{'.implode(",", $outputBuffer).'}');
+}
+
+// Добавляет лог-сообщение в выдачу для клиента 
+function lll($s) {
+    global $logBuffer;
+    array_push($logBuffer, '"'.jsonifyMessageText($s).'"');
 }
 
 // В сессию записываем id юзера, а в куки - новый куки-ключ

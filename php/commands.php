@@ -5,25 +5,31 @@ function cmdCheckSessionStatus() {
     global $userId;
 
     // Достаём id юзера из сессии
-    //$_SESSION['plasmax_user_id'] = 0; // <<<<<<<<<<<<<<<<<<<<<<<<
+    //$_SESSION['plasmax_user_id'] = 0; // <<<<<<<<<<<<<<<<<<<<<<<< делаем вид что сессия протухла
     $userId = @$_SESSION['plasmax_user_id'];
 
     // Если сессия протухла - пытаемся создаёть её по ключу в куках
     if (empty($userId)) {
         $key = getCookieKey();
 
+        lll('auth from key: '.$key);
+
          //$key = '341C2DE7-AE8D-4FF6-8DC8-383120CE0DDB'; // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
         if (isset($key)) {
+            lll('  yes, we have key');
             $result = mysql_query('SELECT * FROM tbl_users WHERE logkey="'.$key.'" LIMIT 1');
             sqlerr();
 
             // Юзер найден
             if (mysql_num_rows($result) > 0) {
+                lll('  and user found');
                 $rows = mysql_fetch_assoc($result);
                 initSession(intval($rows['id_user']));
             }
         }
+    } else {
+        lll('auth from session successfully');
     }
 }
 

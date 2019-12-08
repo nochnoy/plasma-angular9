@@ -39,6 +39,7 @@ export class MessageService {
         this.headers = new HttpHeaders({
             'Content-Type': 'application/json; charset=utf-8',
         });
+        console.log('Will be connecting to ' + TopSecret.ApiPath);
     }
 
     /**
@@ -57,7 +58,7 @@ export class MessageService {
 
         let postParams = 
 
-        console.log('▶ '+TopSecret.ApiPath + '/' + commandName + ':' + paramsS);
+        console.log('⮞⮞ ' + commandName + ':' + paramsS);
 
         this.http.post(
             TopSecret.ApiPath, 
@@ -70,7 +71,9 @@ export class MessageService {
             }
         ).subscribe(
             (json) => {
-                console.log('◀ ' + json);
+                console.groupCollapsed('⮜⮜ ' + commandName);
+                console.log(json);
+                console.groupEnd();
                 let result: any = null;
                 try {
                     result = JSON.parse(json);
@@ -101,6 +104,17 @@ export class MessageService {
      * Тут можно ловить события типа разавторизации.
      */
     private globalCommandHook(input:any) {
+
+        // debug log
+        // Выведем серверные логи
+
+        if (input.log) {
+            console.group('Server logs:');
+            for (var msg of input.log as Array<string>) {
+                console.log('🌸 ' + msg);
+            }
+            console.groupEnd();
+        }
 
         // status
         // Проверим авторизацию

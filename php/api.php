@@ -25,6 +25,9 @@ $command = @$_REQUEST['cmd'];
 
 $outputBuffer = array();
 
+// Массив с лог-сообщениями, которые добавятся в выдачу на клиент
+$logBuffer = array();
+
 // Команды, работающие без авторизации
 
 switch ($command) {
