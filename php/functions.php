@@ -221,20 +221,21 @@ function buildMessagesJson($a, $lastViewed) {
 
 // Возвращает json со списком каналов, доступных юзеру
 function getChannelsJson() {
-    $s = '';
-    
-    //$userId = 3749; // Radikha Yoga
-    $userId = 2; // Marat
+    global $userId;
 
-	$sql  = 'SELECT';
+	$sql  = 'SELECT DISTINCT';
 	$sql .= ' p.id_place, p.parent, p.name, p.description, p.time_changed, p.typ';
     $sql .= ' FROM tbl_places p';
     $sql .= ' LEFT JOIN tbl_access a ON a.id_place=p.id_place AND a.id_user='.$userId;
-    $sql .= ' LEFT JOIN lnk_user_place l ON l.id_place=a.id_place AND l.id_user='.$userId;
-	$sql .= ' ORDER BY id_place DESC';
+    $sql .= ' LEFT JOIN lnk_user_place l ON l.id_place=a.id_place AND l.id_user='.$userId; 
+    $sql .= ' WHERE';
+    $sql .= ' a.role >=0 AND a.role <= 5'; // уровень доступа: 0-зритель, 1-участник, 2-модератор, 3-админ, 4-хозяин, 5-бог, 9-никто
+    $sql .= ' AND l.at_menu="t"'; // юзер хочет чтобы канал был у него в меню
+    $sql .= ' ORDER BY id_place DESC';
 	$result = mysql_query($sql);
 	sqlerr();
 
+    $s = '';    
 	while ($row = mysql_fetch_array($result)) {
 
         if (!empty($s)) {
@@ -242,9 +243,9 @@ function getChannelsJson() {
         }
         
         $s .= '{';
-        $s .= '"id":'				. $row[0];								// id 
-        $s .= ',"pid":'				. $row[1];								// parent id
-        $s .= ',"name":"'		   .jsonifyMessageText($row[2]).'"';	// name
+        $s .= '"id":'				. $row[0];							// id 
+        $s .= ',"pid":'				. $row[1];							// parent id
+        $s .= ',"name":"'		    . jsonifyMessageText($row[2]).'"';	// name
         $s .= ',"desc":"'			. jsonifyMessageText($row[3]).'"';	// description
         $s .= ',"d":"'				. $row[4].'"';						// time_created
         $s .= ',"type":"'			. $row[5].'"';						// type

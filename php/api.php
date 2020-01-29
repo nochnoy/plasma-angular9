@@ -1,4 +1,8 @@
 <?
+include("top_secret.php");
+include("functions.php");
+include("commands.php");
+
 error_reporting(E_ALL);
 
 session_start();
@@ -9,20 +13,17 @@ header("Access-Control-Allow-Methods: POST, GET");
 header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Origin: http://localhost:4200"); // CORS
 
-include("top_secret.php");
-include("functions.php");
-include("commands.php");
-
 mysql_query("SET CHARACTER SET 'cp1251'");
 mysql_query("SET NAMES 'utf8'");
 
-// Команда юзера
+// id юзера, да
+$userId = NULL;
 
+// Команда юзера
 $command = @$_REQUEST['cmd'];
 
 // Массив, в который набъются json'ы ответов всех выполнившихся команд. 
 // Потом их склеим и выдадим клиенту.
-
 $outputBuffer = array();
 
 // Массив с лог-сообщениями, которые добавятся в выдачу на клиент
@@ -65,16 +66,16 @@ switch ($command) {
         cmdGetChannels('2019-10-12 23:45:18'); // <<<<<<<<<<<<<<<<<<<<<<< сделай нормальный lasviewed
         break;
 
+    case 'get_channels':
+        cmdGetChannels($_REQUEST['lv']);
+        break;
+
 	case 'get_channel':
         cmdGetChannel($_REQUEST['cid'], $_REQUEST['lv']);
 		break;
 
 	case 'get_thread':
         cmdGetThread($_REQUEST['tid'], $_REQUEST['lv']);
-        break;
-        
-    case 'get_channels':
-        cmdGetChannels($_REQUEST['lv']);
         break;
 }
 
