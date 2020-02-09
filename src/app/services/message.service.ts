@@ -93,6 +93,7 @@ export class MessageService {
                 }
             },
             (err: HttpErrorResponse) => {
+                alert('HTTP Error: ' + err.url + ': ' + err.message);
                 console.error('HTTP Error: ' + err.url + ': ' + err.message);
             }
         );
@@ -138,6 +139,8 @@ export class MessageService {
                 page = new Page();
                 page.id = parseInt(item['id']);
                 page.name = item['name'];
+                page.timeChanged = item['d'];
+                page.timeViewed = item['v'];
                 this.menuPages.push(page);
             }
         }

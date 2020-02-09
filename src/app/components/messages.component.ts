@@ -23,7 +23,7 @@ import { MessageService } from '../services/message.service';
                         <!--  [style.color]="getTextColor(message)" -->
                         <div class="text">
                             <div class="ico"></div>
-                            <b>{{message.nick}}<u *ngIf="message.isStarred"></u>:</b>
+                            <b>{{message.nick}}<u *ngIf="message.isStarred"></u></b>
                             {{message.text}}
                         </div>
                     </ng-container>
@@ -32,7 +32,7 @@ import { MessageService } from '../services/message.service';
                     <ng-container *ngSwitchCase="1">
                         <div class="text text-gray" (click)="unfoldGray($event, message)">
                             <div class="ico"></div>
-                            <b>{{message.nick}}<u *ngIf="message.isStarred"></u>:</b>
+                            <b>{{message.nick}}<u *ngIf="message.isStarred"></u></b>
                             {{message.text}}
                         </div>
                     </ng-container>

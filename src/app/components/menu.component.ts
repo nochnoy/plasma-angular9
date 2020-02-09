@@ -7,7 +7,10 @@ import { Page } from '../model/page.model';
     template: `
         <div class="logo"></div>
         <ul *ngFor="let page of service.menuPages">
-            <li><a [routerLink]="['forum/', page.id]" routerLinkActive="active">{{page.name}}</a></li>
+            <li>
+                <u *ngIf="page.timeChanged > page.timeViewed"></u>
+                <a [routerLink]="['forum/', page.id]" routerLinkActive="active">{{page.name}}</a>
+            </li>
         </ul>
         <a href (click)="logOut()">Выход</a>
     `,

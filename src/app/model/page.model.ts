@@ -4,4 +4,6 @@ import { Utils } from '../utils';
 export class Page {
     id: number;
     name: string;
+    timeChanged: string;
+    timeViewed: string;
 }

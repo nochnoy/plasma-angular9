@@ -224,7 +224,7 @@ function getChannelsJson() {
     global $userId;
 
 	$sql  = 'SELECT DISTINCT';
-	$sql .= ' p.id_place, p.parent, p.name, p.description, p.time_changed, p.typ';
+	$sql .= ' p.id_place, p.parent, p.name, p.description, p.time_changed, p.typ, l.time_viewed';
     $sql .= ' FROM tbl_places p';
     $sql .= ' LEFT JOIN tbl_access a ON a.id_place=p.id_place AND a.id_user='.$userId;
     $sql .= ' LEFT JOIN lnk_user_place l ON l.id_place=a.id_place AND l.id_user='.$userId; 
@@ -249,6 +249,7 @@ function getChannelsJson() {
         $s .= ',"desc":"'			. jsonifyMessageText($row[3]).'"';	// description
         $s .= ',"d":"'				. $row[4].'"';						// time_created
         $s .= ',"type":"'			. $row[5].'"';						// type
+        $s .= ',"v":"'			    . $row[6].'"';						// time_viewed
         $s .= '}';
 
 	}
