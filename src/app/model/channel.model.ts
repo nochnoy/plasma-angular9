@@ -3,7 +3,7 @@ import { Thread } from './thread.model';
 
 export class Channel {
 
-    private threads: Array<Thread>;
+    public threads: Array<Thread>;
     private threadsById: Map<number, Thread>;
 
     public deserialize(input: any) {
