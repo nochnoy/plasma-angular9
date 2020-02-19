@@ -57,6 +57,10 @@ export class Message {
         this.parent = parent;
     }
 
+    public updateStarred() {
+        this.isStarred = this.thread.channel.lastViewed < this.timeCreated;
+    }
+
     public clone(): Message {
         const c = new Message();
 
@@ -91,7 +95,6 @@ export class Message {
         this.nick           = raw.n;
         this.text           = raw.t;
         this.timeCreated    = raw.d;
-        this.isStarred      = raw.star;
 
         if (raw.hasOwnProperty('cm')) {
             this.commentsCount = raw.cm;

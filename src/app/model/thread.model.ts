@@ -2,15 +2,18 @@ import { Shlop } from './shlop.model';
 import { Message, MessageDisplayType } from './message.model';
 import { ShlopMessage } from './shlop-message.model';
 import { Utils } from '../utils';
+import { Channel } from './channel.model';
 
 export class Thread {
 
-    constructor(rootId: number) {
+    constructor(rootId: number, channel: Channel) {
         this.rootId = rootId;
+        this.channel = channel;
     }
 
     // Properries -------------------------------------------------------------
-
+    
+    public channel: Channel;
     public rootId: number;
     public root: Message;
     public starred = new Array<Message>();
@@ -19,7 +22,7 @@ export class Thread {
     public isExpanded = false;
     public commentsCount = 0;
     public commentsCountText = '';
-
+    
     // Хеш сообщений дерева
     // Помни, что при  схлопах сообщения исчезают из иерархии, но остаются в этом хеше
     private map = new Map<number, Message>();
@@ -42,6 +45,7 @@ export class Thread {
     public addMessage(rawMessage: any): Message {
         const m = this.getOrCreateMessage(rawMessage.id);
         m.deserialize(rawMessage, this.rootId);
+        m.updateStarred();
 
         if (m.parentId) {
             const parent = this.getOrCreateMessage(m.parentId);

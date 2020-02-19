@@ -206,10 +206,6 @@ function buildMessagesJson($a, $lastViewed) {
 		$s .= ',"t":"'				. jsonifyMessageText($row[5]).'"';	    // text
 		$s .= ',"d":"'				. $row[6].'"';						    // time_created
 
-		if ($row[6] > $lastViewed) {
-			$s .= ',"star":' . 1;											// Есть ли звёздочка
-		}
-
 		if ($row[7] > 0) {
 			$s .= ',"cm":"'.$row[7].'"';								    // Количество детей (только у верхнеуровневых)
 		}

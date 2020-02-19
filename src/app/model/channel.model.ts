@@ -4,6 +4,7 @@ import { Thread } from './thread.model';
 export class Channel {
 
     public threads: Array<Thread>;
+    public lastViewed: string;
     private threadsById: Map<number, Thread>;
 
     public deserialize(input: any) {
@@ -26,7 +27,7 @@ export class Channel {
             threadId = rawMessage.tid || rawMessage.id; // Если у сообщения нет tid значит он сам рут треда
             t = threadsById.get(threadId);
             if (!t) {
-                t = new Thread(threadId);
+                t = new Thread(threadId, this);
                 threadsById.set(threadId, t);
                 this.threads.push(t);
             }
