@@ -4,8 +4,9 @@ import { Thread } from './thread.model';
 export class Channel {
 
     public threads: Array<Thread>;
-    public lastViewed: string;
     private threadsById: Map<number, Thread>;
+    
+    public timeViewed: string;
 
     public deserialize(input: any) {
         let i: number;

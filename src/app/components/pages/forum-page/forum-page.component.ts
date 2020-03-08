@@ -10,16 +10,15 @@ import {map} from 'rxjs/operators';
 })
 export class ForumPageComponent implements OnInit {
 
-    public forumId: number;
+    public channelId: number;
 
     constructor(
         private route: ActivatedRoute
     ) { }
 
     ngOnInit() {
-        this.route.params.pipe(map(p => p.id))
-            .subscribe((id: any) => {
-            this.forumId = parseInt(id) || 0;
+        this.route.params.pipe(map(p => p.id)).subscribe((id: any) => {
+            this.channelId = parseInt(id) || 0;
         });
     }
 

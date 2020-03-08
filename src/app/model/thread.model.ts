@@ -189,7 +189,7 @@ export class Thread {
         let starredMessage: Message;
         let dm: Message;
         let m: Message;
-        const dt = new Thread(this.rootId);
+        const dt = new Thread(this.rootId, this.channel);
         dt.isDigest = true;
         dt.starredMaxId = this.starredMaxId;
 

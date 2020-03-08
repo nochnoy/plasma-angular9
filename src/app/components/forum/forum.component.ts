@@ -30,27 +30,28 @@ private _isReady = false;
 
 /** id */
 @Input()
-public set id(value: number) {
-    this._id = value;
+public set channelId(value: number) {
+    this._channelId = value;
     this.tryLoad();
 }
-public get id(): number {
-    return this._id;
+public get channelId(): number {
+    return this._channelId;
 }
-private _id: number;
+private _channelId: number;
 
 ngOnInit() {
     this.isReady = true;
 }
 
 private tryLoad() {
-    if (this._id && this._isReady) {
-        const lastViewed = '2019-09-22 22:21:06';
-        this.messagesService.getChannel(this.id, lastViewed, (input) => {
+    if (this._channelId && this._isReady) {
+        this.channel = this.messagesService.getOrCreateChannel(this._channelId);
+
+        console.log("### channel timeViewed==="+this.channel.timeViewed);
+
+        this.messagesService.loadChannel(this.channelId, this.channel.timeViewed, (input) => {
             let channelInput = input['channel'];
             if (channelInput) {
-                this.channel = new Channel();
-                this.channel.lastViewed = lastViewed;
                 this.channel.deserialize(channelInput);
             }
         });
@@ -63,7 +64,7 @@ onExpandClick(event, thread: Thread) {
     if (thread.isLoaded) {
         thread.isExpanded = true;
     } else {
-        this.messagesService.getThread(thread.rootId, '2019-09-22 22:21:06', (input) => {
+        this.messagesService.loadThread(thread.rootId, thread.channel.timeViewed, (input) => {
             thread.addMessages(input.thread.messages);
             thread.isExpanded = true;
         });

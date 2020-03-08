@@ -4,10 +4,13 @@ import { Observable, Subject, BehaviorSubject } from "rxjs";
 
 import { Message } from '@model/message.model';
 import { TopSecret } from '@model/top-secret';
-import { Page } from '../model/page.model';
+import { Page, PageType } from '@model/page.model';
+import { Channel } from '@model/channel.model';
 
 @Injectable()
 export class MessageService {
+
+    private channels: Map<number, Channel> = new Map<number, Channel>();
 
     public colorBg = '#F4E5D7';
     public colorText = '#313e41';
@@ -31,7 +34,7 @@ export class MessageService {
     }
 
     // Список страниц в главном меню
-    public menuPages = new Array<Page>();
+    public pages = new Array<Page>();
 
     constructor(
         private http: HttpClient
@@ -40,6 +43,15 @@ export class MessageService {
             'Content-Type': 'application/json; charset=utf-8',
         });
         console.log('Will be connecting to ' + TopSecret.ApiPath);
+    }
+
+    public getOrCreateChannel(id: number): Channel {
+        var channel = this.channels.get(id);
+        if (!channel) {
+            channel = new Channel();
+            this.channels.set(id, channel);
+        }
+        return channel;
     }
 
     /**
@@ -129,19 +141,28 @@ export class MessageService {
         }
 
         // channels
-        // Пришёл список каналов для главного меню
+        // Пришёл список страниц для главного меню
 
         if (input.channels) {
-            this.menuPages.length = 0;
+            this.pages.length = 0;
             var a = input.channels.channels as Array<any>;
             let page: Page;
             for (const item of a) {
+
+                // Добавим такую страницу в меню
                 page = new Page();
+                page.type = PageType.Channel;
                 page.id = parseInt(item['id']);
                 page.name = item['name'];
                 page.timeChanged = item['d'];
                 page.timeViewed = item['v'];
-                this.menuPages.push(page);
+                this.pages.push(page);
+
+                // Обновим/создадим канал (если это страница канала) 
+                if (page.type == PageType.Channel) {
+                    var channel = this.getOrCreateChannel(page.id);
+                    channel.timeViewed = page.timeViewed;
+                }
             }
         }
     }
@@ -180,21 +201,21 @@ export class MessageService {
     /**
      * Запрашивает с сервера сообщения канала
      */
-    public getChannel(channelId: number, lastVieved: string, callback: Function) {
+    public loadChannel(channelId: number, lastVieved: string, callback: Function) {
         this.sendCommand('get_channel', {cid: channelId.toString(), lv: lastVieved}, callback);
     }
 
     /**
      * Запрашивает с сервера сообщения одного треда
      */
-    public getThread(threadId: number, lastVieved: string, callback: Function) {
+    public loadThread(threadId: number, lastVieved: string, callback: Function) {
         this.sendCommand('get_thread', {tid: threadId.toString(), lv: lastVieved}, callback);
     }
 
     /**
      * Запрашивает с сервера список страниц для левого меню
      */
-    public getChannels(lastVieved: string, callback: Function) {
+    public loadChannels(lastVieved: string, callback: Function) {
         this.sendCommand('get_channels', {lv: lastVieved}, callback);
     }
 

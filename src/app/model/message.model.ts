@@ -58,7 +58,7 @@ export class Message {
     }
 
     public updateStarred() {
-        this.isStarred = this.thread.channel.lastViewed < this.timeCreated;
+        this.isStarred = this.thread.channel.timeViewed < this.timeCreated;
     }
 
     public clone(): Message {

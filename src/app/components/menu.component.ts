@@ -6,7 +6,7 @@ import { Page } from '../model/page.model';
     selector: 'menu',
     template: `
         <div class="logo"></div>
-        <ul *ngFor="let page of service.menuPages">
+        <ul *ngFor="let page of service.pages">
             <li>
                 <u *ngIf="page.timeChanged > page.timeViewed"></u>
                 <a [routerLink]="['forum/', page.id]" routerLinkActive="active">{{page.name}}</a>
