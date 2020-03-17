@@ -95,12 +95,12 @@ export class Thread {
     }
 
     private getMessage(id: number): Message {
-        const m = this.map.get(id);
+        let m = this.map.get(id);
         return m || null;
     }
 
     private getOrCreateMessage(id: number): Message {
-        let m = this.map.get(id);
+        let m = this.getMessage(id);
         if (!m) {
             m = new Message();
             m.id = id;
@@ -192,6 +192,15 @@ export class Thread {
         const dt = new Thread(this.rootId, this.channel);
         dt.isDigest = true;
         dt.starredMaxId = this.starredMaxId;
+
+        // Перельём в map ветки-дайджеста все сообщения из оригинальной ветки 
+        // чтобы избежать нечаянного создания новых сообщений функцией getOrCreate()
+
+        this.map.forEach(origMsg => {
+            let digestMsg = origMsg.clone();
+            digestMsg.thread = dt;
+            dt.map.set(origMsg.id, digestMsg);
+        });
 
         // Строим серые деревья (дайджесты)
 
