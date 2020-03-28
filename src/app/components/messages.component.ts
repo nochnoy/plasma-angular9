@@ -39,7 +39,7 @@ import { MessageService } from '../services/message.service';
 
                     <!-- Схлоп (MessageDisplayType.SHLOP) -->
                     <ng-container *ngSwitchCase="10">
-                        <div class="text text-gray" (click)="unshlop($event, message)">
+                        <div class="text text-gray expand" (click)="unshlop($event, message)">
                             {{message.shlop.lengthText}}
                         </div>
                     </ng-container>
